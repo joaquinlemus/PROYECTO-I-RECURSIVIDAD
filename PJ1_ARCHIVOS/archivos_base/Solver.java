@@ -27,7 +27,6 @@ public class Solver{
 
     }
 
-
     public String solve(Maze maze, Node actualNode){
         //Implemente su metodo aqui. Sientase libre de implementar métodos adicionales
         // N, O, S, E, U, D
@@ -93,28 +92,16 @@ public class Solver{
                 } else {
                     possibilities--;
                 }
-                /* 
-                    N -> solution.push(north)
-                                |
-                                V
-                    Norte no es una solucion.
+
+                if (possibilities == 0) {
+                    notAnOption(solution);
                     solution.pop();
-                */
-            } else {
-                char erase = solution.peek();
-                if (erase == north) {
-                   lastVisitedNode.north = false; 
-                } else if (erase == south) {
-                    lastVisitedNode.south = false;
-                } else if (erase == east) {
-                    lastVisitedNode.east = false;
-                } else if (erase == west) {
-                    lastVisitedNode.west = false;
-                } else if (erase == up) {
-                    lastVisitedNode.up = false;
-                } else if (erase == down) {
-                    lastVisitedNode.down = false;
+                    actualNode = lastVisitedNode;
+                    solve(maze, actualNode);
                 }
+
+            } else {
+                notAnOption(solution);
                 solution.pop();
                 actualNode = lastVisitedNode;
                 solve(maze, actualNode);
@@ -127,7 +114,20 @@ public class Solver{
         return null;
     }
 
-    // private boolean isDanger(Node node) {
-    //     return node.danger ? true : false;
-    // }
+    private void notAnOption(Stack<Character> solution) {
+        char erase = solution.peek();
+        if (erase == north) {
+           lastVisitedNode.north = false; 
+        } else if (erase == south) {
+            lastVisitedNode.south = false;
+        } else if (erase == east) {
+            lastVisitedNode.east = false;
+        } else if (erase == west) {
+            lastVisitedNode.west = false;
+        } else if (erase == up) {
+            lastVisitedNode.up = false;
+        } else if (erase == down) {
+            lastVisitedNode.down = false;
+        }
+    }
 }
