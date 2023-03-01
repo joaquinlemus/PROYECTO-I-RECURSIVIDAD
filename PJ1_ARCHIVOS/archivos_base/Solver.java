@@ -1,4 +1,5 @@
 import java.util.Stack;
+import java.util.ArrayList;
 
 /*
     Esta es su clase principal. El unico metodo que debe implementar es
@@ -18,8 +19,9 @@ public class Solver{
     private final char up = 'U';
     private final char down = 'D';
     private Stack<Character> solution; 
+    private Maze maze;
 
-    public Solver(Maze maze){
+    public Solver(){
         //Sientase libre de implementar el contructor de la forma que usted lo desee
         solution = new Stack<>();
         actualNode = maze.getStartingSpace();  // seteamos (0,0,0)
@@ -111,7 +113,19 @@ public class Solver{
     }
 
     private String turnIntoString(Stack<Character> toConvert){
-        return null;
+        String solution = "[";
+        ArrayList<Character> c = new ArrayList<>();
+        while(!toConvert.isEmpty()) {
+            c.add(toConvert.pop());
+        }   
+        for (int i = c.size()-1; i >= 0; i--) {
+            if (i == 0) {
+                solution += c.get(i) + "]";
+                break;
+            }
+            solution += c.get(i) + ", ";
+        }
+        return solution;
     }
 
     private void notAnOption(Stack<Character> solution) {
