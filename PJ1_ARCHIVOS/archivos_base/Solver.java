@@ -119,11 +119,12 @@ public class Solver{
         }   
         for (int i = c.size()-1; i >= 0; i--) {
             if (i == 0) {
-                solution += c.get(i) + "]";
+                solution += c.get(i);
                 break;
             }
             solution += c.get(i) + ", ";
         }
+        solution += "]";
         return solution;
     }
 
