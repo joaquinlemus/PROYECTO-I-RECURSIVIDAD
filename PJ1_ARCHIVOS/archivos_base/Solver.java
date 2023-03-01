@@ -19,9 +19,8 @@ public class Solver{
     private final char up = 'U';
     private final char down = 'D';
     private Stack<Character> solution; 
-    private Maze maze;
 
-    public Solver(){
+    public Solver(Maze maze){
         //Sientase libre de implementar el contructor de la forma que usted lo desee
         solution = new Stack<>();
         actualNode = maze.getStartingSpace();  // seteamos (0,0,0)
