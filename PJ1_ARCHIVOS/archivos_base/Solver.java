@@ -1,147 +1,147 @@
-import java.util.Stack;
-import java.util.ArrayList;
+import java.util.LinkedList;
 
-/*
-    Esta es su clase principal. El unico metodo que debe implementar es
-    public String[] solve(Maze maze)
-    pero es libre de crear otros metodos y clases en este u otro archivo que desee.
-*/
 public class Solver{
 
-    private Node actualNode;
-    private int lastVisitedNodeID; // Representa el ID de la ultima camara visitada.
-    // Indica si es posible moverse en una direccion
-    private Node lastVisitedNode;
     private final char north = 'N';
     private final char south = 'S';
     private final char east = 'E';
     private final char west = 'W';
     private final char up = 'U';
     private final char down = 'D';
-    private Stack<Character> solution; 
+    
+    private boolean finished = false;
 
-    public Solver(Maze maze){
-        //Sientase libre de implementar el contructor de la forma que usted lo desee
-        solution = new Stack<>();
-        actualNode = maze.getStartingSpace();  // seteamos (0,0,0)
-        lastVisitedNode = actualNode; // (0,0,0)
+    private Node actualNode;
+    private Node nextNode;
 
+    private LinkedList<Character> solution;
+
+    public Solver(){
+        solution = new LinkedList<>();
     }
-
-    public String solve(Maze maze, Node actualNode){
-        //Implemente su metodo aqui. Sientase libre de implementar métodos adicionales
-        // N, O, S, E, U, D
-        if (actualNode.isExit) {
-            return turnIntoString(solution);
-        } else {
-            if (!actualNode.danger) {
-                int possibilities = 6;
-                // NORTE
-                if (maze.moveNorth(actualNode) != actualNode) {
-                    lastVisitedNode = actualNode;
-                    actualNode = maze.moveNorth(actualNode);
-                    solution.push(north);
-                    solve(maze, actualNode);
-                } else {
-                    possibilities--;
-                }
-                // OESTE
-                if (maze.moveWest(actualNode) != actualNode) {
-                    lastVisitedNode = actualNode;
-                    actualNode = maze.moveWest(actualNode);
-                    solution.push(west);
-                    solve(maze, actualNode);
-                } else {
-                    possibilities--;
-                }            
-                // SUR
-                if (maze.moveSouth(actualNode) != actualNode) {
-                    lastVisitedNode = actualNode;
-                    actualNode = maze.moveSouth(actualNode);
-                    solution.push(south);
-                    solve(maze, actualNode);
-                } else {
-                    possibilities--;
-                }
-
-                // ESTE
-                if (maze.moveEast(actualNode) != actualNode) {
-                    lastVisitedNode = actualNode;
-                    actualNode = maze.moveEast(actualNode);
-                    solution.push(east);
-                    solve(maze, actualNode);
-                } else {
-                    possibilities--;
-                }
-
-                // ARRIBA
-                if (maze.moveUp(actualNode) != actualNode) {
-                    lastVisitedNode = actualNode;
-                    actualNode = maze.moveUp(actualNode);
-                    solution.push(up);
-                    solve(maze, actualNode);
-                } else {
-                    possibilities--;
-                }
-
-                // ABAJO
-                if (maze.moveDown(actualNode) != actualNode) {
-                    lastVisitedNode = actualNode;
-                    actualNode = maze.moveDown(actualNode);
-                    solution.push(down);
-                    solve(maze, actualNode);
-                } else {
-                    possibilities--;
-                }
-
-                if (possibilities == 0) {
-                    notAnOption(solution);
-                    solution.pop();
-                    actualNode = lastVisitedNode;
-                    solve(maze, actualNode);
-                }
-
-            } else {
-                notAnOption(solution);
-                solution.pop();
-                actualNode = lastVisitedNode;
-                solve(maze, actualNode);
-            }
-        }
-        return "[-1]";
-    }
-
-    private String turnIntoString(Stack<Character> toConvert){
-        String solution = "[";
-        ArrayList<Character> c = new ArrayList<>();
-        while(!toConvert.isEmpty()) {
-            c.add(toConvert.pop());
-        }   
-        for (int i = c.size()-1; i >= 0; i--) {
-            if (i == 0) {
-                solution += c.get(i);
+    
+    public String toConvert(LinkedList<Character> ls) {
+        String s = "[";
+        for (int i = 0; i < ls.size(); i++) {
+            if (i == ls.size()-1) {
+                s+=ls.get(i);
                 break;
             }
-            solution += c.get(i) + ", ";
+            s += ls.get(i)+",";
         }
-        solution += "]";
-        return solution;
+        s += "]";
+        return s;
     }
-
-    private void notAnOption(Stack<Character> solution) {
-        char erase = solution.peek();
-        if (erase == north) {
-           lastVisitedNode.north = false; 
-        } else if (erase == south) {
-            lastVisitedNode.south = false;
-        } else if (erase == east) {
-            lastVisitedNode.east = false;
-        } else if (erase == west) {
-            lastVisitedNode.west = false;
-        } else if (erase == up) {
-            lastVisitedNode.up = false;
-        } else if (erase == down) {
-            lastVisitedNode.down = false;
+    
+    public LinkedList<Character> solutionToMaze(Maze maze, Node actualNode, LinkedList<Character> path) {
+        if (!path.isEmpty()){
+            if(path.getLast() == north){
+                actualNode.south = false;
+            } else if(path.getLast() == south){
+                actualNode.north = false;
+            } else if(path.getLast() == west){
+                actualNode.east = false;
+            } else if(path.getLast() == east){
+                actualNode.west = false;
+            } else if(path.getLast() == up){
+                actualNode.down = false;
+            } else if(path.getLast() == down){
+                actualNode.up = false;
+            }
         }
+        if (actualNode.isExit) {
+            finished = true;
+            return path;
+        } else {
+                if (actualNode.north) {
+                    nextNode = maze.moveNorth(actualNode);
+                    if (!nextNode.danger && nextNode != maze.getStartingSpace()) {
+                        actualNode.north = false;
+                        path.add(north);
+                        solutionToMaze(maze, nextNode, path);
+                        if (finished) {
+                            return path;
+                        } else {
+                            path.removeLast();
+                        }
+                    }
+                }
+                if (actualNode.west) {
+                    nextNode = maze.moveWest(actualNode);
+                    if (!nextNode.danger && nextNode != maze.getStartingSpace()) {
+                        actualNode.west = false;
+                        path.add(west);
+                        solutionToMaze(maze, nextNode, path);
+                        if (finished) {
+                            return path;
+                        } else {
+                            path.removeLast();
+                        }
+                    } 
+                }
+                if (actualNode.south) {
+                    nextNode = maze.moveSouth(actualNode);
+                    if (!nextNode.danger && nextNode != maze.getStartingSpace()) {
+                        actualNode.south = false;
+                        path.add(south);
+                        solutionToMaze(maze, nextNode, path);
+                        if (finished) {
+                            return path;
+                        } else {
+                            path.removeLast();
+                        }
+                    } 
+                }
+                if (actualNode.east) {
+                    nextNode = maze.moveEast(actualNode);
+                    if (!nextNode.danger && nextNode != maze.getStartingSpace()) {
+                        actualNode.east = false;
+                        path.add(east);
+                        solutionToMaze(maze, nextNode, path);
+                        if (finished) {
+                            return path;
+                        } else {
+                            path.removeLast();
+                        }
+                    } 
+                }
+                if (actualNode.down) {
+                    nextNode = maze.moveDown(actualNode);
+                    if (!nextNode.danger && nextNode != maze.getStartingSpace()) {
+                        actualNode.down = false;
+                        path.add(down);
+                        solutionToMaze(maze, nextNode, path);
+                        if (finished) {
+                            return path;
+                        } else {
+                            path.removeLast();
+                        }
+                    }
+                }
+                if (actualNode.up) {
+                    nextNode = maze.moveUp(actualNode);
+                    if (!nextNode.danger && nextNode != maze.getStartingSpace()) {
+                        actualNode.up = false;
+                        path.add(up);
+                        solutionToMaze(maze, nextNode, path);
+                        if (finished) {
+                            return path;
+                        } else {
+                            path.removeLast();
+                        }
+                    }
+                }
+                if (finished) {
+                    return path;
+                }
+            }
+        return path;
+    }
+    
+    public String solve(Maze maze){
+        actualNode = maze.getStartingSpace();
+        solution = new LinkedList<>();
+        finished = false;
+        return toConvert(solutionToMaze(maze, actualNode, solution));
     }
 }
